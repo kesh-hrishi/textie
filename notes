@@ -1,0 +1,58 @@
+
+****************defines*********************
+
+CTRL_KEY: the ctrl key in keyboard input under the hood it is an AND operation where it keeps only the lower 5 bits and
+converts the other bits to 0. to simulate this we take a character and use bitwise AND operation with 0x1f which is 
+00011111.
+
+********************************************
+
+read() function to read each byte from the keyboard to achive that you need to supply read fucntion with STDIN_FILENO file 
+descriptor. STDFIN_FILENO is the standard input file descriptor you'll have to use that because read() is a generic function
+that can read from regular files, sockets, pipes, and standard inputs. 
+
+**. turn off canonical mode and enable raw mode - canonical mode only accepts input from the terminal when 'enter' key is pressed
+    therefore we need to switch to raw mode
+
+    turn off ctrl-C and ctrl-Z that terminltes and suspends the program respectively
+
+**  clear the screen : write(STDOUT_FILENO, "\x1b[2J", 4); 4 in the 3rd argument means we are writing 4 bytes out to the terminal
+    those being \x1b[2J first byte is \x1b which is an excape character escape sequence tells the terminal to do various text formatting,
+    escape sequence always starts with escape caharacter and ends with [
+    we use J command to clear the screen and 2 to clear the entire screen
+
+**  Reposition the cursor: clearing the screen ends up with the cursor at the end of the screen to fix this we reposition the 
+    cursor back by write(STDOUT_FILENO, "\x1b[H", 3); here we use the H command (cursor position) default argument is 1 
+    ie, \x1b[1:1H
+
+**  Get window size : by calling ioctl() with TIOCGWINSZ (terminal input output control get window size)
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) ws is the struct to save window size 
+
+**  Making a buch of small write calls is not efficient it might cause screen flickering to avoid that we can make use of a buffer
+    and write this buffer at the end for the whole screen unfortunatly C doesn't have dynamic string so we make our own.
+
+    struct abuf {
+        char *b;
+        int len;
+      }
+
+    to append strings s to the buffer ab first we need to make sure there is enough memory so we use realloc to ask for a block of 
+    memory that is the size of current string plus the size of the string we are appending
+
+    realloc(ab->b, ab->len + len)
+
+    Then we use memcpy() to copy the string s after the end of the current data in the buffer, and we update the pointer and length 
+    of the abuf to the new values
+
+**  There is another source of screen flickering we need to take care of when terminal is drawing the screen the cursor might
+    be displayed thus causing flickering
+    let’s hide the cursor before refreshing the screen, and show it again immediately after the refresh finishes.
+    we can achive this by using h and l commands(set mode, reset mode) with escape sequence
+    abAppend(&ab, "\x1b[?25l", 6);
+    abAppend(&ab, "\x1b[?25h", 6);
+
+    Instead of clearing the entire screen before each refresh, it seems more optimal to clear each line as we redraw them. 
+    Let’s remove the <esc>[2J (clear entire screen) escape sequence, and instead put a <esc>[K sequence at the end of each line we draw.
+
+    moving the cursor by the user. first is to keep tarck of x and y position in the global state editor
+    cx and cy initialy give them 0
