@@ -5,6 +5,8 @@
 #include <termios.h>
 #include <unistd.h>
 
+#define CTRL_KEY(k) ((k) & 0x1f)
+
 struct termios orig_termios;
 
 void die(const char *s) {
@@ -47,7 +49,7 @@ int main() {
     } else {
       printf("%d ('%c')\r\n", c, c);
     }
-    if (c == 'q')
+    if (c == CTRL_KEY('q'))
       break;
   }
   return 0;

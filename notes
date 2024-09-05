@@ -64,4 +64,7 @@ that can read from regular files, sockets, pipes, and standard inputs.
 **  Error handling: using perror() from stdio.h and exit() from stdlib.h perror looks at global errorno variable and prints 
     a descriptive error message along with string you provide perror() function to use as context
 
+**  ctrl-Q to quit application: ctrl under the hood bitwise-ANDs a character with value 00011111 in other words ctrl sets the
+    upper three chracters to 0. so to achive this we use 0x1f which is 00011111 
+
 
