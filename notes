@@ -16,6 +16,16 @@ that can read from regular files, sockets, pipes, and standard inputs.
 
     turn off ctrl-C and ctrl-Z that terminltes and suspends the program respectively
 
+**  setting timeouts for read() function: currently read waits indefinitely for input we can set timeout so that read returns 
+    when there is no input for a certain amount of time. VMIN and VTIME comes from termios.h and are indexes for c_cc fields
+    which are knows as control charactes.
+
+**  Error handling: using perror() from stdio.h and exit() from stdlib.h perror looks at global errorno variable and prints 
+    a descriptive error message along with string you provide perror() function to use as context
+
+**  ctrl-Q to quit application: ctrl under the hood bitwise-ANDs a character with value 00011111 in other words ctrl sets the
+    upper three chracters to 0. so to achive this we use 0x1f which is 00011111 
+
 **  clear the screen : write(STDOUT_FILENO, "\x1b[2J", 4); 4 in the 3rd argument means we are writing 4 bytes out to the terminal
     those being \x1b[2J first byte is \x1b which is an excape character escape sequence tells the terminal to do various text formatting,
     escape sequence always starts with escape caharacter and ends with [
@@ -56,15 +66,3 @@ that can read from regular files, sockets, pipes, and standard inputs.
 
     moving the cursor by the user. first is to keep tarck of x and y position in the global state editor
     cx and cy initialy give them 0
-
-**  setting timeouts for read() function: currently read waits indefinitely for input we can set timeout so that read returns 
-    when there is no input for a certain amount of time. VMIN and VTIME comes from termios.h and are indexes for c_cc fields
-    which are knows as control charactes.
-
-**  Error handling: using perror() from stdio.h and exit() from stdlib.h perror looks at global errorno variable and prints 
-    a descriptive error message along with string you provide perror() function to use as context
-
-**  ctrl-Q to quit application: ctrl under the hood bitwise-ANDs a character with value 00011111 in other words ctrl sets the
-    upper three chracters to 0. so to achive this we use 0x1f which is 00011111 
-
-
