@@ -56,3 +56,12 @@ that can read from regular files, sockets, pipes, and standard inputs.
 
     moving the cursor by the user. first is to keep tarck of x and y position in the global state editor
     cx and cy initialy give them 0
+
+**  setting timeouts for read() function: currently read waits indefinitely for input we can set timeout so that read returns 
+    when there is no input for a certain amount of time. VMIN and VTIME comes from termios.h and are indexes for c_cc fields
+    which are knows as control charactes.
+
+**  Error handling: using perror() from stdio.h and exit() from stdlib.h perror looks at global errorno variable and prints 
+    a descriptive error message along with string you provide perror() function to use as context
+
+
